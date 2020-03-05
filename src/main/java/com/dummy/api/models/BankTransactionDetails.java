@@ -6,17 +6,17 @@ import java.io.Serializable;
 @Entity
 public class BankTransactionDetails implements Serializable {
 
-    private static final long serialVersionUID =  1L;
+    private static final double serialVersionUID =  1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private long credit;
-    private long amount;
-    private long debit;
-    private long totalCredit;
-    private long totalDebit;
-    private long totalTransaction;
-    private long accountBalance;
+    private double credit;
+    private double amount;
+    private double debit;
+    private double totalCredit;
+    private double totalDebit;
+    private double totalTransaction;
+    private double accountBalance;
     @ManyToOne
     private BankCard bankCard;
 
@@ -28,51 +28,51 @@ public class BankTransactionDetails implements Serializable {
         this.id = id;
     }
 
-    public long getCredit() {
+    public double getCredit() {
         return credit;
     }
 
-    public void setCredit(long credit) {
+    public void setCredit(double credit) {
         this.credit = credit;
     }
 
-    public long getDebit() {
+    public double getDebit() {
         return debit;
     }
 
-    public void setDebit(long debit) {
+    public void setDebit(double debit) {
         this.debit = debit;
     }
 
-    public long getTotalCredit() {
+    public double getTotalCredit() {
         return totalCredit;
     }
 
-    public void setTotalCredit(long totalCredit) {
+    public void setTotalCredit(double totalCredit) {
         this.totalCredit = totalCredit;
     }
 
-    public long getTotalDebit() {
+    public double getTotalDebit() {
         return totalDebit;
     }
 
-    public void setTotalDebit(long totalDebit) {
+    public void setTotalDebit(double totalDebit) {
         this.totalDebit = totalDebit;
     }
 
-    public long getTotalTransaction() {
+    public double getTotalTransaction() {
         return totalTransaction;
     }
 
-    public void setTotalTransaction(long totalTransaction) {
+    public void setTotalTransaction(double totalTransaction) {
         this.totalTransaction = totalTransaction;
     }
 
-    public long getAccountBalance() {
+    public double getAccountBalance() {
         return accountBalance;
     }
 
-    public void setAccountBalance(long accountBalance) {
+    public void setAccountBalance(double accountBalance) {
         this.accountBalance = accountBalance;
     }
 
@@ -80,11 +80,11 @@ public class BankTransactionDetails implements Serializable {
         return bankCard;
     }
 
-    public long getAmount() {
+    public double getAmount() {
         return amount;
     }
 
-    public void setAmount(long amount) {
+    public void setAmount(double amount) {
         this.amount = amount;
     }
 

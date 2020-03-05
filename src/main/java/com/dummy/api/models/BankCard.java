@@ -12,6 +12,7 @@ public class BankCard implements Serializable {
     private int yearOfExpiry;
     private int monthOfExpiry;
     private int pin;
+    private long bankCardNumber;
     private String bankCardType;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -77,6 +78,14 @@ public class BankCard implements Serializable {
 
     public BankUser getBankUser() {
         return bankUser;
+    }
+
+    public long getBankCardNumber() {
+        return bankCardNumber;
+    }
+
+    public void setBankCardNumber(long bankCardNumber) {
+        this.bankCardNumber = bankCardNumber;
     }
 
     public void setBankUser(BankUser bankUser) {

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @RestController
@@ -94,45 +95,81 @@ public class BankCardController {
         return bankTransactionDetailsRepository.save(bankTransactionDetails);
     }
 
-    @PutMapping("/transaction/credits/{pin}/{amount}")
-    public BankTransactionDetails updateBankTransactionDetails(@Valid @RequestBody BankTransactionDetails bankTransactionDetails, @PathVariable Integer pin, Integer amount) throws ResourceNotFoundException {
-        return getBankTransactionDetails(bankTransactionDetails,pin, amount);
+    @PutMapping("/transaction/credits/{bankCardNumber}/{amount}")
+    public BankTransactionDetails updateBankTransactionDetails(@Valid @RequestBody BankTransactionDetails bankTransactionDetails, @PathVariable("bankCardNumber") long bankCardNumber,
+                                                               @PathVariable("amount") Long amount) throws ResourceNotFoundException {
+        return getBankTransactionDetails(bankTransactionDetails, bankCardNumber, amount);
     }
 
-    private BankTransactionDetails getBankTransactionDetails(@Valid @RequestBody BankTransactionDetails bankTransactionDetails, @PathVariable Integer pin, Integer amount) throws ResourceNotFoundException {
-        return bankCardRepository.findByPin(pin).map(bankcard ->{
-            BankTransactionDetails bankTransactionDetails1 = bankTransactionDetailsRepository.findByBankCard(bankcard);
-            bankTransactionDetails1.setCredit(bankTransactionDetails.getAmount()+bankTransactionDetails1.getCredit());
-            bankTransactionDetails1.setTotalCredit(bankTransactionDetails.getTotalCredit() + bankTransactionDetails1.getCredit());
-            bankTransactionDetails1.setAccountBalance(bankTransactionDetails.getAccountBalance() + bankTransactionDetails1.getCredit());
-            bankTransactionDetails1.setAmount(bankTransactionDetails.getAmount());
-            return bankTransactionDetailsRepository.save(bankTransactionDetails1);
-        }).orElseThrow(() -> new ResourceNotFoundException("This account details is not available on our server!!!"));
+    private BankTransactionDetails getBankTransactionDetails(BankTransactionDetails bankTransactionDetails, Long bankCardNumber, Long amount) throws ResourceNotFoundException {
+        System.out.println(bankCardRepository.findByBankCardNumber(bankCardNumber));
+        Optional<BankCard> bankCard = bankCardRepository.findByBankCardNumber(bankCardNumber);
+        return getBankTransactionDetails(bankTransactionDetails, amount, bankCard);
+    }
+
+    private BankTransactionDetails getBankTransactionDetails(BankTransactionDetails bankTransactionDetails, Long amount, Optional<BankCard> bankCard) throws ResourceNotFoundException {
+        if (bankCard.isEmpty()) {
+            throw new ResourceNotFoundException("Card details not found");
+        }
+        BankTransactionDetails bankTransactionDetails1 = bankTransactionDetailsRepository.findByBankCard(bankCard.get());
+        bankTransactionDetails1.setAmount(amount);
+        bankTransactionDetails1.setCredit(bankTransactionDetails.getAmount()+bankTransactionDetails1.getCredit());
+        bankTransactionDetails1.setTotalCredit(bankTransactionDetails.getTotalCredit() + bankTransactionDetails1.getCredit());
+        bankTransactionDetails1.setAccountBalance(bankTransactionDetails.getAccountBalance() + bankTransactionDetails1.getCredit());
+        bankTransactionDetails1 = bankTransactionDetailsRepository.save(bankTransactionDetails1);
+        System.out.println(bankTransactionDetails1);
+        return bankTransactionDetails1;
+    }
+
+    private BankTransactionDetails getBankTransactionDetails(BankTransactionDetails bankTransactionDetails, Integer pin, Long amount) throws ResourceNotFoundException {
+        System.out.println(bankCardRepository.findByPin(pin));
+        Optional<BankCard> bankCard = bankCardRepository.findByPin(pin);
+        return getBankTransactionDetails(bankTransactionDetails, amount, bankCard);
     }
 
     @PutMapping("/transaction/debit/{token}/{amount}")
-    public BankTransactionDetails updateBankTransactionDetails(@Valid @RequestBody BankTransactionDetails bankTransactionDetails, @PathVariable int token, Long amount) throws ResourceNotFoundException {
-        return bankOTPRepository.findByToken(token).map(bankOTP ->{
-            final BankTransactionDetails bankTransactionDetails1 = bankTransactionDetailsRepository.findByBankCard(bankOTP.getBankCard());
-            bankTransactionDetails1.setDebit(bankTransactionDetails.getDebit());
-            bankTransactionDetails1.setTotalDebit(bankTransactionDetails.getTotalDebit() + bankTransactionDetails.getDebit());
-            bankTransactionDetails1.setAccountBalance(bankTransactionDetails.getAccountBalance() - bankTransactionDetails.getDebit());
-            bankTransactionDetails1.setAmount(bankTransactionDetails.getAmount());
-            return bankTransactionDetailsRepository.save(bankTransactionDetails1);
-        }).orElseThrow(() -> new ResourceNotFoundException("Insufficient Balance!!!"));
+    public BankTransactionDetails debitBankTransactionDetails(@Valid @RequestBody BankTransactionDetails bankTransactionDetails, @PathVariable("token") Integer token, @PathVariable("amount") Long amount) throws ResourceNotFoundException {
+        Optional<BankOTP> bankOTP = bankOTPRepository.findByToken(token);
+        if (bankOTP.isEmpty()) {
+            throw new ResourceNotFoundException("OTP no longer exists!!!");
+        }
+        BankTransactionDetails bankTransactionDetails1 = bankTransactionDetailsRepository.findByBankCard(bankOTP.get().getBankCard());
+        bankTransactionDetails1.setAmount(amount);
+        if(bankTransactionDetails1.getAccountBalance()-bankTransactionDetails1.getAmount() <= 0){
+            throw new ResourceNotFoundException("Insufficient Balance!!!");
+        }
+        bankTransactionDetails1.setDebit(bankTransactionDetails.getAmount()+amount);
+        bankTransactionDetails1.setTotalDebit(bankTransactionDetails.getTotalDebit() + bankTransactionDetails1.getDebit());
+        bankTransactionDetails1.setAccountBalance(bankTransactionDetails.getAccountBalance() - bankTransactionDetails1.getDebit());
+        return bankTransactionDetailsRepository.save(bankTransactionDetails1);
+        }
+
+    @PutMapping("/transaction/credit/{token}/{amount}")
+    public BankTransactionDetails updateCreditBankTransactionDetails(@Valid @RequestBody BankTransactionDetails bankTransactionDetails, @PathVariable(value = "token") int token, @PathVariable(value = "amount") Long amount) throws ResourceNotFoundException {
+
+        Optional<BankOTP> bankOTP = bankOTPRepository.findByToken(token);
+        if (bankOTP.isEmpty()) {
+        throw new ResourceNotFoundException("OTP no longer exists!!!");
     }
+    BankTransactionDetails bankTransactionDetails1 = bankTransactionDetailsRepository.findByBankCard(bankOTP.get().getBankCard());
+        bankTransactionDetails1.setAmount(amount);
+        bankTransactionDetails1.setCredit(bankTransactionDetails.getAmount()+bankTransactionDetails1.getCredit());
+        bankTransactionDetails1.setTotalCredit(bankTransactionDetails.getTotalCredit() + bankTransactionDetails1.getCredit());
+        bankTransactionDetails1.setAccountBalance(bankTransactionDetails.getAccountBalance() + bankTransactionDetails1.getCredit());
+        return bankTransactionDetailsRepository.save(bankTransactionDetails1);
+}
 
     @PostMapping("/transaction/debit/{pin}")
     public List<BankOTP> setAndSendOTPtoUser(@PathVariable(value = "pin") int pin, @Valid @RequestBody BankOTP bankOtp) throws ResourceNotFoundException{
-
         Random rnd = new Random();
         int tokenNumber = rnd.nextInt(999999);
-        SmsRequest smsRequest = new SmsRequest("+2348154794351", "Your One-Time Password is "+tokenNumber);
-        service.sendSms(smsRequest);
         return bankCardRepository.findByPin(pin).map(bankcard ->{
+            String phoneNumber = bankcard.getBankUser().getPhoneNumber();
             bankOtp.setBankCard(bankcard);
             bankOtp.setToken(tokenNumber);
             bankOTPRepository.save(bankOtp);
+            SmsRequest smsRequest = new SmsRequest(phoneNumber, "Your One-Time Password is "+tokenNumber);
+            service.sendSms(smsRequest);
         return bankOTPRepository.findAll();
         }).orElseThrow(() ->new ResourceNotFoundException("No such account number was found!!!"));
     }
