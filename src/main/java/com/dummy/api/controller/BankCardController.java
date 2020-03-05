@@ -129,7 +129,7 @@ public class BankCardController {
     }
 
     @PutMapping("/transaction/debit/{token}/{amount}")
-    public BankTransactionDetails debitBankTransactionDetails(@Valid @RequestBody BankTransactionDetails bankTransactionDetails, @PathVariable("token") Integer token, @PathVariable("amount") Long amount) throws ResourceNotFoundException {
+    public BankTransactionDetails debitBankTransactionDetails(@PathVariable("token") Integer token, @PathVariable("amount") Long amount) throws ResourceNotFoundException {
         Optional<BankOTP> bankOTP = bankOTPRepository.findByToken(token);
         if (bankOTP.isEmpty()) {
             throw new ResourceNotFoundException("OTP no longer exists!!!");
@@ -139,31 +139,32 @@ public class BankCardController {
         if(bankTransactionDetails1.getAccountBalance()-bankTransactionDetails1.getAmount() <= 0){
             throw new ResourceNotFoundException("Insufficient Balance!!!");
         }
-        bankTransactionDetails1.setDebit(bankTransactionDetails.getAmount()+amount);
-        bankTransactionDetails1.setTotalDebit(bankTransactionDetails.getTotalDebit() + bankTransactionDetails1.getDebit());
-        bankTransactionDetails1.setAccountBalance(bankTransactionDetails.getAccountBalance() - bankTransactionDetails1.getDebit());
+        bankTransactionDetails1.setDebit(bankTransactionDetails1.getAmount()+amount);
+        bankTransactionDetails1.setTotalDebit(bankTransactionDetails1.getTotalDebit() + bankTransactionDetails1.getDebit());
+        bankTransactionDetails1.setAccountBalance(bankTransactionDetails1.getAccountBalance() - bankTransactionDetails1.getDebit());
         return bankTransactionDetailsRepository.save(bankTransactionDetails1);
         }
 
-    @PutMapping("/transaction/debit/{bankaccountnumber}/{amount}")
-    public BankTransactionDetails debitBankTransactionWithBankAccountNumber(@Valid @RequestBody BankTransactionDetails bankTransactionDetails, @PathVariable("bankaccountnumber") Long bankaccountnumber, @PathVariable("amount") Long amount) throws ResourceNotFoundException {
+    @PutMapping("/transaction/transfer-debit/{bankaccountnumber}/{amount}")
+    public BankTransactionDetails debitBankTransactionWithBankAccountNumber( @PathVariable("bankaccountnumber") Long bankaccountnumber, @PathVariable("amount") Long amount) throws ResourceNotFoundException {
+
         Optional<BankCard> bankCard = bankCardRepository.findByBankAccountNumber(bankaccountnumber);
         if (bankCard.isEmpty()) {
             throw new ResourceNotFoundException("This Account holder doesn't exists!!!");
         }
         BankTransactionDetails bankTransactionDetails1 = bankTransactionDetailsRepository.findByBankCard(bankCard);
         bankTransactionDetails1.setAmount(amount);
-        if(bankTransactionDetails1.getAccountBalance()-bankTransactionDetails1.getAmount() <= 0){
+        if(bankTransactionDetails1.getAccountBalance()-amount<= 0){
             throw new ResourceNotFoundException("Insufficient Balance!!!");
         }
-        bankTransactionDetails1.setDebit(bankTransactionDetails.getAmount()+amount);
-        bankTransactionDetails1.setTotalDebit(bankTransactionDetails.getTotalDebit() + bankTransactionDetails1.getDebit());
-        bankTransactionDetails1.setAccountBalance(bankTransactionDetails.getAccountBalance() - bankTransactionDetails1.getDebit());
+        bankTransactionDetails1.setDebit(bankTransactionDetails1.getAmount()+amount);
+        bankTransactionDetails1.setTotalDebit(bankTransactionDetails1.getTotalDebit() + bankTransactionDetails1.getDebit());
+        bankTransactionDetails1.setAccountBalance(bankTransactionDetails1.getAccountBalance() - amount);
         return bankTransactionDetailsRepository.save(bankTransactionDetails1);
     }
 
     @PutMapping("/transaction/credit/{token}/{amount}")
-    public BankTransactionDetails updateCreditBankTransactionDetails(@Valid @RequestBody BankTransactionDetails bankTransactionDetails, @PathVariable(value = "token") int token, @PathVariable(value = "amount") Long amount) throws ResourceNotFoundException {
+    public BankTransactionDetails updateCreditBankTransactionDetails(@PathVariable(value = "token") int token, @PathVariable(value = "amount") Long amount) throws ResourceNotFoundException {
 
         Optional<BankOTP> bankOTP = bankOTPRepository.findByToken(token);
         if (bankOTP.isEmpty()) {
@@ -171,9 +172,9 @@ public class BankCardController {
     }
     BankTransactionDetails bankTransactionDetails1 = bankTransactionDetailsRepository.findByBankCard(bankOTP.get().getBankCard());
         bankTransactionDetails1.setAmount(amount);
-        bankTransactionDetails1.setCredit(bankTransactionDetails.getAmount()+bankTransactionDetails1.getCredit());
-        bankTransactionDetails1.setTotalCredit(bankTransactionDetails.getTotalCredit() + bankTransactionDetails1.getCredit());
-        bankTransactionDetails1.setAccountBalance(bankTransactionDetails.getAccountBalance() + bankTransactionDetails1.getCredit());
+        bankTransactionDetails1.setCredit(bankTransactionDetails1.getAmount()+bankTransactionDetails1.getCredit());
+        bankTransactionDetails1.setTotalCredit(bankTransactionDetails1.getTotalCredit() + bankTransactionDetails1.getCredit());
+        bankTransactionDetails1.setAccountBalance(bankTransactionDetails1.getAccountBalance() + bankTransactionDetails1.getCredit());
         return bankTransactionDetailsRepository.save(bankTransactionDetails1);
 }
 
