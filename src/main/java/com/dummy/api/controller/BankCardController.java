@@ -145,6 +145,23 @@ public class BankCardController {
         return bankTransactionDetailsRepository.save(bankTransactionDetails1);
         }
 
+    @PutMapping("/transaction/debit/{bankaccountnumber}/{amount}")
+    public BankTransactionDetails debitBankTransactionWithBankAccountNumber(@Valid @RequestBody BankTransactionDetails bankTransactionDetails, @PathVariable("bankaccountnumber") Long bankaccountnumber, @PathVariable("amount") Long amount) throws ResourceNotFoundException {
+        Optional<BankCard> bankCard = bankCardRepository.findByBankAccountNumber(bankaccountnumber);
+        if (bankCard.isEmpty()) {
+            throw new ResourceNotFoundException("This Account holder doesn't exists!!!");
+        }
+        BankTransactionDetails bankTransactionDetails1 = bankTransactionDetailsRepository.findByBankCard(bankCard);
+        bankTransactionDetails1.setAmount(amount);
+        if(bankTransactionDetails1.getAccountBalance()-bankTransactionDetails1.getAmount() <= 0){
+            throw new ResourceNotFoundException("Insufficient Balance!!!");
+        }
+        bankTransactionDetails1.setDebit(bankTransactionDetails.getAmount()+amount);
+        bankTransactionDetails1.setTotalDebit(bankTransactionDetails.getTotalDebit() + bankTransactionDetails1.getDebit());
+        bankTransactionDetails1.setAccountBalance(bankTransactionDetails.getAccountBalance() - bankTransactionDetails1.getDebit());
+        return bankTransactionDetailsRepository.save(bankTransactionDetails1);
+    }
+
     @PutMapping("/transaction/credit/{token}/{amount}")
     public BankTransactionDetails updateCreditBankTransactionDetails(@Valid @RequestBody BankTransactionDetails bankTransactionDetails, @PathVariable(value = "token") int token, @PathVariable(value = "amount") Long amount) throws ResourceNotFoundException {
 
@@ -159,6 +176,9 @@ public class BankCardController {
         bankTransactionDetails1.setAccountBalance(bankTransactionDetails.getAccountBalance() + bankTransactionDetails1.getCredit());
         return bankTransactionDetailsRepository.save(bankTransactionDetails1);
 }
+
+
+
 
     @PostMapping("/transaction/debit/{pin}")
     public List<BankOTP> setAndSendOTPtoUser(@PathVariable(value = "pin") int pin, @Valid @RequestBody BankOTP bankOtp) throws ResourceNotFoundException{

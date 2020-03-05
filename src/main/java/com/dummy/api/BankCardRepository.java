@@ -13,4 +13,6 @@ public interface BankCardRepository extends JpaRepository<BankCard, Long> {
     BankUser findByBankUser(Long id);
 
     Optional<BankCard> findByBankCardNumber(Long bankCardNumber);
+
+    Optional<BankCard> findByBankAccountNumber(Long bankaccountnumber);
 }
