@@ -1,10 +1,9 @@
 package com.dummy.api;
 
 
-import javafx.application.Application;
+import com.twilio.rest.api.v2010.account.Application;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
