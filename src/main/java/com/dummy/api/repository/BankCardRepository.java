@@ -1,4 +1,4 @@
-package com.dummy.api;
+package com.dummy.api.repository;
 
 import com.dummy.api.models.BankCard;
 import com.dummy.api.models.BankUser;
@@ -8,11 +8,11 @@ import java.util.Optional;
 
 public interface BankCardRepository extends JpaRepository<BankCard, Long> {
 
-    Optional<BankCard> findByPin(int pin);
+  Optional<BankCard> findByPin(int pin);
 
-    BankUser findByBankUser(Long id);
+  BankUser findByBankUser(Long id);
 
-    Optional<BankCard> findByBankCardNumber(Long bankCardNumber);
+  Optional<BankCard> findByBankCardNumber(Long bankCardNumber);
 
-    Optional<BankCard> findByBankAccountNumber(Long bankaccountnumber);
+  Optional<BankCard> findByBankAccountNumber(Long bankaccountnumber);
 }

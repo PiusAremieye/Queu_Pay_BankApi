@@ -1,4 +1,4 @@
-package com.dummy.api;
+package com.dummy.api.configuration;
 
 
 import org.springframework.boot.context.properties.ConfigurationProperties;

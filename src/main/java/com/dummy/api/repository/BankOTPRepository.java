@@ -1,4 +1,4 @@
-package com.dummy.api;
+package com.dummy.api.repository;
 
 import com.dummy.api.models.BankOTP;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface BankOTPRepository extends JpaRepository<BankOTP, Long> {
-    Optional<BankOTP> findByToken(int token);
+  Optional<BankOTP> findByToken(int token);
 
-    BankOTP findByBankCard(BankOTP bankOTP);
+  BankOTP findByBankCard(BankOTP bankOTP);
 }

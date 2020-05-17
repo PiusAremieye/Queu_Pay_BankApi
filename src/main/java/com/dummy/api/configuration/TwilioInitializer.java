@@ -1,4 +1,4 @@
-package com.dummy.api;
+package com.dummy.api.configuration;
 
 import com.twilio.Twilio;
 import org.springframework.beans.factory.annotation.Autowired;

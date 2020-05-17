@@ -1,28 +1,17 @@
-package com.dummy.api.models;
+package com.dummy.api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-import java.io.Serializable;
-
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Table(name = "BankCards")
-@Entity
-public class BankCard extends AuditModel {
-
+public class CardDto {
   private int cvv;
   private int yearOfExpiry;
   private int monthOfExpiry;
   private int pin;
   private long bankCardNumber;
   private String bankCardType;
-
-  @ManyToOne
-  private BankUser bankUser;
 }
