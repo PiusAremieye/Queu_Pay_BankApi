@@ -29,7 +29,7 @@ public class SMSServiceImpl implements SMSsender {
   public void sendSMS(SmsRequest smsRequest) {
     if (isPhoneNumberValid(smsRequest.getPhoneNumber())) {
       PhoneNumber to = new PhoneNumber(smsRequest.getPhoneNumber());
-      PhoneNumber from = new PhoneNumber("+18053035074");
+      PhoneNumber from = new PhoneNumber(twilioConfiguration.getTrialNumber());
       String message = smsRequest.getMessage();
       MessageCreator creator = Message.creator(to, from, message);
       creator.create();

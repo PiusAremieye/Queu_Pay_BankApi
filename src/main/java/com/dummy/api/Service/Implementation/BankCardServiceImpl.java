@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BankCardServiceImpl implements BankCardService {
@@ -30,6 +31,7 @@ public class BankCardServiceImpl implements BankCardService {
     BankUser bankUser = jwtProvider.resolveUser(request);
     BankCard bankCard = new BankCard();
     bankCard.setBankCardNumber(cardDto.getBankCardNumber());
+    bankCard.setAccountNumber(cardDto.getAccountNumber());
     bankCard.setBankCardType(cardDto.getBankCardType());
     bankCard.setCvv(cardDto.getCvv());
     bankCard.setMonthOfExpiry(cardDto.getMonthOfExpiry());
@@ -46,7 +48,20 @@ public class BankCardServiceImpl implements BankCardService {
   }
 
   @Override
-  public BankCard getBankCardDetailsByBankAccountNumber(Long bankAccountNumber) {
-    return bankCardRepository.findById(bankAccountNumber).orElseThrow(() -> new CustomException("No such Account Number exists!!!", HttpStatus.NOT_FOUND));
+  public BankCard getBankCardDetailsByBankAccountNumber(Long bankAccountNumber, HttpServletRequest request) {
+    BankUser bankUser = jwtProvider.resolveUser(request);
+    Optional<BankCard> bankCard = bankCardRepository.findByAccountNumber(bankAccountNumber);
+    if (bankCard.isPresent()){
+      if (bankCard.get().getBankUser().equals(bankUser)){
+        return bankCard.get();
+      }
+      throw new CustomException("Account not yours!!!", HttpStatus.NOT_FOUND);
+    }
+    throw new CustomException("No such Account Number exists!!!", HttpStatus.NOT_FOUND);
+  }
+
+  @Override
+  public BankCard findAnyBankAccount(Long bankAccountNumber) {
+    return bankCardRepository.findByAccountNumber(bankAccountNumber).orElseThrow(() -> new CustomException("No such Account Number exists!!!", HttpStatus.NOT_FOUND));
   }
 }

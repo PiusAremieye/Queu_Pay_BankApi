@@ -9,5 +9,6 @@ import java.util.List;
 public interface BankCardService {
   BankCard createNewBankCardDetailsForUser(CardDto cardDto, HttpServletRequest request);
   List<BankCard> getAllBankCardDetails();
-  BankCard getBankCardDetailsByBankAccountNumber(Long bankAccountNumber);
+  BankCard getBankCardDetailsByBankAccountNumber(Long bankAccountNumber, HttpServletRequest request);
+  BankCard findAnyBankAccount(Long bankAccountNumber);
 }

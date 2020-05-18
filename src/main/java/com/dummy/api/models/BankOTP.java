@@ -11,11 +11,11 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Table(name = "BankCards")
+@Table(name = "BankOtps")
 @Entity
 public class BankOTP extends AuditModel {
     @ManyToOne
     private BankCard bankCard;
 
-    private int token;
+    private Integer token;
 }

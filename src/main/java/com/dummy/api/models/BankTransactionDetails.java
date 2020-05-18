@@ -16,13 +16,10 @@ import java.io.Serializable;
 @Entity
 public class BankTransactionDetails extends AuditModel {
 
-  private double credit;
-  private double amount;
-  private double debit;
-  private double totalCredit;
-  private double totalDebit;
-  private double totalTransaction;
-  private double accountBalance;
+  private Double credit;
+  private Double amount;
+  private Double debit;
+  private Double accountBalance;
   @ManyToOne
   private BankCard bankCard;
 }

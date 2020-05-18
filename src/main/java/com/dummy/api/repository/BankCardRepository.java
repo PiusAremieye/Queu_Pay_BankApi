@@ -8,11 +8,11 @@ import java.util.Optional;
 
 public interface BankCardRepository extends JpaRepository<BankCard, Long> {
 
-  Optional<BankCard> findByPin(int pin);
+  Optional<BankCard> findByPin(Integer pin);
 
   BankUser findByBankUser(Long id);
 
   Optional<BankCard> findByBankCardNumber(Long bankCardNumber);
 
-  Optional<BankCard> findByBankAccountNumber(Long bankaccountnumber);
+  Optional<BankCard> findByAccountNumber(Long bankaccountnumber);
 }

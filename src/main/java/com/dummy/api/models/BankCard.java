@@ -16,11 +16,12 @@ import java.io.Serializable;
 @Entity
 public class BankCard extends AuditModel {
 
-  private int cvv;
-  private int yearOfExpiry;
-  private int monthOfExpiry;
-  private int pin;
-  private long bankCardNumber;
+  private Integer cvv;
+  private Integer yearOfExpiry;
+  private Integer monthOfExpiry;
+  private Integer pin;
+  private Long bankCardNumber;
+  private Long accountNumber;
   private String bankCardType;
 
   @ManyToOne
